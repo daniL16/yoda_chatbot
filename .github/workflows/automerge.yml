@@ -1,0 +1,19 @@
+name: Automerge
+
+on:
+  - pull_request_review
+
+jobs:
+  docker-build:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Approve and merge
+        uses: daniL16/pr-merge-appoved@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          required_approves: 2
+          label: 'approved'
+          commit_message: 'Automerge'

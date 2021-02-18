@@ -1,0 +1,53 @@
+name: CD
+on:
+  push:
+    branches:  [develop,master]
+
+jobs:
+  tests:
+    name: Staging tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Deploy in stage
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGE_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          passphrase: ${{ secrets.DEPLOY_PASS }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            sudo su
+            cd /docker/api_events
+            sudo git checkout develop
+            sudo git pull
+            sudo docker-compose -f docker-compose.prod.yml up -d --build
+            sudo make tests
+
+  deploy:
+    name: Deploy
+    needs: [tests]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Deploy in prod
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          passphrase: ${{ secrets.DEPLOY_PASS }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            sudo su
+            cd /docker/api_events
+            sudo git pull
+            sudo docker-compose -f docker-compose.prod.yml up -d --build
+      - name: Notify deploy
+        uses: daniL16/action-notify-rocketChat@v2.0.0
+        with:
+          message: 'Amijo, se ha realizado un deploy de la rama master en produccion'
+          ROCKET_CHAT_HOOK: 'jx3Xu73EQWA54bZwh/PBaQsa9NAD4zfCXLzvfWPpvPELi5jDfStqTfmuzuxkYqkhMv'
+          ROCKET_CHAT_URL: 'https://chat.bulevip.com'
+          BOT_NAME: 'Github Bot'
+          BOT_AVATAR: 'https://i.pinimg.com/originals/bd/5c/46/bd5c46c4c1579c56c60920301ea3e642.png'

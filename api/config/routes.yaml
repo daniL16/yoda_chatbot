@@ -3,6 +3,6 @@ test:
     controller: App\Controller\TestController::index
 
 send_message:
-    path: /send
+    path: /send_message
    # method: 'POST'
     controller: App\Controller\MessageController::send

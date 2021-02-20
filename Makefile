@@ -11,7 +11,7 @@ help: ## Show this help message
 
 run: ## Start the containers
 	docker network create symfony-api-platform-network || true
-	U_ID=${UID} docker-compose up -d 
+	U_ID=${UID} docker-compose up -d --build
 
 ssh: ## ssh's into the be container
 	U_ID=${UID} docker exec -it --user ${UID} ${DOCKER_BE} bash

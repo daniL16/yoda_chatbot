@@ -3,12 +3,29 @@
 namespace App\Controller;
 
 use App\Service\ChatBotApiService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
 
 class MessageController
 {
-    public function send(string $message = 'Hi!', string $sessionToken = null)
+    public function send(Request $request)
     {
+        $data = json_decode($request->getContent(), true);
+        $message = $data['message'];
+
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            return new JsonResponse(
+                ['error' => sprintf('Invalid JSON format: %s', json_last_error_msg())], 400
+            );
+        }
+
+        if (!isset($data['message'])) {
+            return new JsonResponse(['error' => 'message is required'], 400);
+        }
+        // @todo
+        $sessionToken = null;
         $handler = new ChatBotApiService();
         $response = $handler->sendMessage($message, $sessionToken);
 

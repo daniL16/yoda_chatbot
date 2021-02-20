@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Service;
 
 use GuzzleHttp\Client;
@@ -8,7 +7,6 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class InbentaApiService
 {
-
     /** @var string Api Bearer Token */
     private $token;
 
@@ -21,9 +19,8 @@ class InbentaApiService
     /** @var array */
     protected $apiConfig = [
         'auth' => ['uri' => '/auth', 'method' => 'POST', 'auth' => false],
-        'get_apis' => ['uri' => '/apis', 'method' => 'GET', 'auth' => true]
+        'get_apis' => ['uri' => '/apis', 'method' => 'GET', 'auth' => true],
     ];
-
 
     public function __construct()
     {
@@ -35,7 +32,6 @@ class InbentaApiService
         $this->token = $this->getToken();
     }
 
-
     protected function exec(string $api, array $data = [], array $options = []): \Psr\Http\Message\ResponseInterface
     {
         // Build url
@@ -45,29 +41,28 @@ class InbentaApiService
         // Build headers array
         $headers = [
             'x-inbenta-key' => $this->apiKey,
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ];
         if ($this->apiConfig[$api]['auth']) {
             $headers['Authorization'] = 'Bearer '.$this->token;
         }
-        foreach ($options as $key => $value){
+        foreach ($options as $key => $value) {
             $headers[$key] = $value;
         }
-
 
         try {
             switch ($this->apiConfig[$api]['method']) {
                 case 'GET':
-                    $response = $this->client->get($url, ['headers'=> $headers]);
+                    $response = $this->client->get($url, ['headers' => $headers]);
                     break;
                 case 'POST':
-                    $response = $this->client->post($url, ['json' => $data,'headers'=> $headers]);
+                    $response = $this->client->post($url, ['json' => $data, 'headers' => $headers]);
                     break;
                 default:
                     throw new \InvalidArgumentException('Method not allowed');
             }
-        }catch (GuzzleException $exception){
-            die($exception->getMessage());
+        } catch (GuzzleException $exception) {
+            exit($exception->getMessage());
         }
 
         return $response;
@@ -76,12 +71,13 @@ class InbentaApiService
     protected function getToken(): string
     {
         $body = ['secret' => $this->secret];
-        $response = json_decode($this->exec('auth',$body)->getBody()->getContents());
+        $response = json_decode($this->exec('auth', $body)->getBody()->getContents());
+
         return $response->accessToken;
     }
 
-    protected function getApiUrls(): \stdClass {
+    protected function getApiUrls(): \stdClass
+    {
         return json_decode($this->exec('get_apis')->getBody()->getContents());
     }
-
 }

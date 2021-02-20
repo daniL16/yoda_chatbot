@@ -1,3 +1,8 @@
 test:
     path: /test
     controller: App\Controller\TestController::index
+
+send_message:
+    path: /send
+   # method: 'POST'
+    controller: App\Controller\MessageController::send

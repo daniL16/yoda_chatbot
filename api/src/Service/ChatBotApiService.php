@@ -25,14 +25,19 @@ class ChatBotApiService extends InbentaApiService
         return $response->sessionToken;
     }
 
-    public function sendMessage(string $message, string $conversation = null){
+    /**
+     * @param string $message Message to send
+     * @param string|null $conversation Session token
+     * @return array Array with bot's answer and sessionToken
+     */
+    public function sendMessage(string $message, string $conversation = null): array {
         if(!$conversation){
             $conversation = $this->openConversation();
         }
 
         $response = $this->exec('send_message',['message'=>$message],['x-inbenta-session' => 'Bearer '.$conversation]);
         $response = json_decode($response->getBody()->getContents());
-        return json_encode(['sessionToken' => $conversation , 'message' => $response->answers[0]->message]);
+        return ['session_token' => $conversation , 'response_message' => $response->answers[0]->message];
     }
 
     private function getApiUrl(): string {

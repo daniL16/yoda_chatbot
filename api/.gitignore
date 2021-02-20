@@ -8,4 +8,6 @@
 /var/
 /vendor/
 /docker/db/
+.php_cs.cache
+.env
 ###< symfony/framework-bundle ###

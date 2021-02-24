@@ -13,8 +13,6 @@ class MessageController
     public function send(Request $request)
     {
         $data = json_decode($request->getContent(), true);
-        $message = $data['message'];
-
         if (JSON_ERROR_NONE !== json_last_error()) {
             return new JsonResponse(
                 ['error' => sprintf('Invalid JSON format: %s', json_last_error_msg())], 400
@@ -24,8 +22,8 @@ class MessageController
         if (!isset($data['message'])) {
             return new JsonResponse(['error' => 'message is required'], 400);
         }
-        // @todo
-        $sessionToken = null;
+        $message = $data['message'];
+        $sessionToken = isset($data['sessionToken']) ? $data['sessionToken'] : null;
         $handler = new ChatBotApiService();
         $response = $handler->sendMessage($message, $sessionToken);
 

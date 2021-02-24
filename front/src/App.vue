@@ -8,6 +8,9 @@
 
 <script>
 
+import api from '@/api.js'
+import {setCookie} from "@/utils.js";
+
 export default {
   name: 'App',
   data(){
@@ -18,16 +21,10 @@ export default {
   }},
   methods:{
       sendMessage(){
-        fetch('http://localhost:250/send_message',
-            {'method': 'POST',
-              body: JSON.stringify({message: this.message})
-            }
-          ).then(res => res.json()).then(res => {
-          console.log(res)
-          this.answer = res.answer
-          this.sessionToken = res.sessionToken
+         api.sendMessage(this.message).then(res => {
+          this.answer = res.data.answer
+          setCookie('conversationToken',res.data.sessionToken,1)
         })
-
     }
   }
 

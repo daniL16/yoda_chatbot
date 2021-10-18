@@ -1,13 +1,18 @@
 import {getCookie} from "./utils";
 import axios from "axios";
 
-const api_url = 'http://localhost:250/send_message';
+const api_url = 'http://localhost:8088/send_message';
 
-axios.defaults.headers.get['Content-Type'] = 'application/json';
+const axiosInstance = axios.create({
+    headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type" : "application/json"
+    }
+});
 
 async function sendMessage(message){
     const cookieToken = getCookie('conversationToken');
-    return axios.post(api_url,{
+    return axiosInstance.post(api_url,{
             message: message,
             sessionToken: cookieToken
         })

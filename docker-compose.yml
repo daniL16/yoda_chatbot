@@ -1,49 +1,33 @@
-version: '3'
+version: '3.4'
 
 services:
+  php:
+    build:
+      context: ./api
+      target: api_php
+    image: php:8.0-fpm-alpine
+    volumes:
+      - ./api:/srv/api_rw,cached
+      - ./api/var:/srv/var:rw
 
   api:
     build:
-      context: api/docker/nginx
-      args:
-        UID: $U_ID
-    ports:
-      - 250:80
-    volumes:
-      - ./api/public:/appdata/www/public
+      context: ./api
+      target: api_nginx
+    image: nginx:stable-alpine
     depends_on:
       - php
-    networks:
-      - symfony-api-network
-  php:
-    container_name: symfony-api-platform-be
-    build:
-      context: api/docker/php
-      args:
-        UID: $U_ID
-    environment:
-      PHP_IDE_CONFIG: serverName=Docker
-      PHP_XDEBUG_ENABLED: 1
-      XDEBUG_CONFIG: remote_host=172.17.0.1 remote_port=9005 # Linux users
-    #      XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9005 # MacOS users
     volumes:
-      - ./api/:/appdata/www
-      - ./api/docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-      - ~/.ssh/id_rsa:/home/appuser/.ssh/id_rsa
-    networks:
-      - symfony-api-network
+      - ./api/public:/srv/api/public:ro
+    ports:
+      - "8088:80"
+
+
   vue-ui:
     build:
       context: ./front
     ports:
-      - "8080:8080"
-    container_name: vue-ui
+      - "5000:8080"
     volumes:
       - ./front:/usr/src/app/front
       - /usr/src/app/front/node_modules
-volumes:
-  api-db-data:
-
-networks:
-  symfony-api-network:
-#    external: true

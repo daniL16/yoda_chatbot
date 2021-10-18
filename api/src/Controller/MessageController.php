@@ -18,6 +18,7 @@ class MessageController
             return new JsonResponse(['error' => 'message is required'], 400);
         }
         $handler = new ChatBotApiService();
+
         return new JsonResponse($handler->sendMessage($data['message'], $data['sessionToken'] ?? null), 200);
     }
 }

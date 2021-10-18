@@ -4,35 +4,31 @@ namespace App\Service;
 
 final class ChatBotApiService extends InbentaApiService
 {
-
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
         $this->baseUrl = $this->getApiUrl();
     }
 
-    /**
-     * @return string
-     */
-    private function getApiUrl(): string{
+    private function getApiUrl(): string
+    {
         $response = json_decode($this->exec('get_apis')->getBody()->getContents());
+
         return $response->apis->chatbot;
     }
 
-    /**
-     * @return string
-     */
     private function openConversation(): string
     {
-            $payload = [
+        $payload = [
                 'lang' => 'es',
             ];
-            $response = json_decode($this->exec('new_conversation', $payload)->getBody()->getContents());
+        $response = json_decode($this->exec('new_conversation', $payload)->getBody()->getContents());
 
         return $response->sessionToken;
     }
 
     /**
-     * @param string $message Message to send
+     * @param string $message      Message to send
      * @param string $conversation Session token
      *
      * @return string Json with bot's answer and sessionToken
@@ -48,6 +44,4 @@ final class ChatBotApiService extends InbentaApiService
 
         return json_encode(['session_token' => $conversation, 'response_message' => $response->answers[0]->message]);
     }
-
-
 }

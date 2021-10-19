@@ -21,12 +21,10 @@ final class ChatBotApiService extends InbentaApiService
     private function getApiUrl(): string
     {
         $response = json_decode($this->exec('get_apis')->getBody()->getContents());
+
         return $response->apis->chatbot;
     }
 
-    /**
-     * @return string
-     */
     private function openConversation(): string
     {
         $payload = [
@@ -38,7 +36,7 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
-     * @param string $message Message to send
+     * @param string $message      Message to send
      * @param string $conversation Session token
      *
      * @return array with bot's answer and sessionToken

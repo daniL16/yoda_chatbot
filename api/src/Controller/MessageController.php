@@ -34,7 +34,7 @@ class MessageController
 
     private function getResponseMessage(string $message, string $conversationToken): string{
         if(str_contains($message, 'force')){
-            $responseMessage = $this->swapiApiClient->getFilms();
+            $responseMessage = json_encode($this->swapiApiClient->getFilms());
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }
         else{
@@ -53,6 +53,6 @@ class MessageController
      * @return string
      */
     private function postProcessNotFound(): string{
-        return $this->swapiApiClient->getFilms();
+        return json_encode($this->swapiApiClient->getFilms());
     }
 }

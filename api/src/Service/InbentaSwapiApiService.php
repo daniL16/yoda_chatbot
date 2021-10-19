@@ -23,7 +23,7 @@ class InbentaSwapiApiService extends InbentaApiService
         return $response->getBody()->getContents();
     }
 
-    public function getFilms(): string
+    public function getFilms(): array
     {
         $query = <<<'GRAPHQL'
                     query allFilms($first:Int) {
@@ -36,10 +36,10 @@ class InbentaSwapiApiService extends InbentaApiService
                   GRAPHQL;
         $response = json_decode($this->makeQuery($query, self::N_FILMS), true);
 
-        return json_encode($response['data']['allFilms']['films']);
+        return $response['data']['allFilms']['films'];
     }
 
-    public function getPeople(): string
+    public function getPeople(): array
     {
         $query = <<<'GRAPHQL'
                  query allPeople($first:Int){
@@ -52,6 +52,6 @@ class InbentaSwapiApiService extends InbentaApiService
                  GRAPHQL;
         $response = json_decode($this->makeQuery($query, self::N_PEOPLE), true);
 
-        return json_encode($response['data']['allPeople']['people']);
+        return $response['data']['allPeople']['people'];
     }
 }

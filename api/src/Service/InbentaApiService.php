@@ -14,9 +14,6 @@ abstract class InbentaApiService
     private string $token;
 
     /** @var string */
-    private string $apiVersion;
-
-    /** @var string */
     protected string $baseUrl;
 
     /** @var string */
@@ -32,16 +29,13 @@ abstract class InbentaApiService
     protected array $apiConfig = [
         'auth' => ['uri' => '/auth', 'method' => 'POST', 'auth' => false],
         'get_apis' => ['uri' => '/apis', 'method' => 'GET', 'auth' => true],
-        'new_conversation' => ['uri' => '/conversation', 'method' => 'POST', 'auth' => true],
-        'send_message' => ['uri' => '/conversation/message', 'method' => 'POST', 'auth' => true],
     ];
 
     public function __construct()
     {
-        $this->baseUrl = $_ENV['INBENTA_API_URL'];
+        $this->baseUrl = $_ENV['INBENTA_API_URL'].'/'.$_ENV['INBENTA_API_VERSION'];
         $this->apiKey = $_ENV['INBENTA_API_KEY'];
         $this->secret = $_ENV['INBENTA_API_SECRET'];
-        $this->apiVersion = $_ENV['INBENTA_API_VERSION'];
         $this->client = new Client();
         $this->token = $this->getToken();
     }
@@ -49,21 +43,10 @@ abstract class InbentaApiService
     protected function exec(string $api, array $data = [], array $options = []): ResponseInterface
     {
         // Build url
-        $url = $this->baseUrl . '/' . $this->apiVersion;
+        $url = $this->baseUrl;
         $url .= $this->apiConfig[$api]['uri'];
 
-        // Build headers array
-        $headers = [
-            'x-inbenta-key' => $this->apiKey,
-            'Content-Type' => 'application/json',
-        ];
-        if ($this->apiConfig[$api]['auth']) {
-            $headers['Authorization'] = 'Bearer ' . $this->token;
-        }
-        foreach ($options as $key => $value) {
-            $headers[$key] = $value;
-        }
-
+        $headers = $this->buildHeader($api, $options);
         try {
             $response = match ($this->apiConfig[$api]['method']) {
                 'GET' => $this->client->get($url, ['headers' => $headers]),
@@ -86,12 +69,24 @@ abstract class InbentaApiService
     }
 
     /**
-     * @param string $token
-     * @return InbentaApiService
+     * @param string $api
+     * @param array $data
+     * @param array $options
+     * @return array
      */
-    public function setToken(string $token): InbentaApiService
-    {
-        $this->token = $token;
-        return $this;
+    private function buildHeader(string $api, array $options = []): array{
+        // Build headers array
+        $headers = [
+            'x-inbenta-key' => $this->apiKey,
+            'Content-Type' => 'application/json',
+        ];
+        if ($this->apiConfig[$api]['auth']) {
+            $headers['Authorization'] = 'Bearer ' . $this->token;
+        }
+        foreach ($options as $key => $value) {
+            $headers[$key] = $value;
+        }
+
+        return $headers;
     }
 }

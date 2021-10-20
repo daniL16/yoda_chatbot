@@ -1,24 +1,34 @@
-import {getCookie} from "./utils";
-import axios from "axios";
+//import axios from "axios";
 
-const api_url = 'http://localhost:8088/send_message';
+//const api_url = 'http://localhost:8088/send_message';
+const fakeResponse = '"{\\"session_token\\":\\"eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJzZXNzaW9uSWQiOiJoMm92ZXVhbjluZXJ1b245bTM2cWhvMWQwNSIsInRpbWVzdGFtcCI6MTYzNDc0MjM5MiwicHJvamVjdCI6InlvZGFfY2hhdGJvdF9lbiJ9.Ox9GzbCs3GN6wh-YAH_piNvQGtdWDSXm4wH1Ot_JXXs\\",\\"response_message\\":\\"Always pass on what you have learned. What would you like to know?\\"}"'
 
-const axiosInstance = axios.create({
-    headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type" : "application/json"
-    }
-});
+// const axiosInstance = axios.create({
+//     headers: {
+//         "Access-Control-Allow-Origin": "*",
+//         "Content-Type" : "application/json"
+//     }
+// });
 
-async function sendMessage(message){
-    const cookieToken = getCookie('conversationToken');
-    return axiosInstance.post(api_url,{
-            message: message,
-            sessionToken: cookieToken
-        })
-        .catch(function (error) {
-            console.log('Error! ' + error);
-        })
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function sendMessage(){
+    //const cookieToken = getCookie('conversationToken');
+    await sleep(5000);
+    return JSON.parse(fakeResponse);
+    // return axiosInstance.post(api_url,{
+    //         message: message,
+    //         sessionToken: cookieToken
+    //     }).then(
+    //         function (response){
+    //             console.log(response)
+    //         }
+    //     )
+    //     .catch(function (error) {
+    //         console.log(error)
+    //     })
 }
 
 

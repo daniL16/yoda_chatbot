@@ -1,33 +1,16 @@
 <template>
   <div id="app">
-    <input type="text" id="message" v-model="message">
-    <button @click="sendMessage"> Submit</button>
-    <p> {{ answer }}</p>
+    <MessageBox></MessageBox>
   </div>
 </template>
 
 <script>
 
-import api from '@/api.js'
-import {setCookie} from "@/utils.js";
+import MessageBox from "./components/MessageBox";
 
 export default {
   name: 'App',
-  data(){
-    return{
-      message: '',
-      answer: '',
-      sessionToken: ''
-  }},
-  methods:{
-      sendMessage(){
-         api.sendMessage(this.message).then(res => {
-          this.answer = res.data.answer
-          setCookie('conversationToken',res.data.sessionToken,1)
-        })
-    }
-  }
-
+  components: {MessageBox}
 }
 </script>
 

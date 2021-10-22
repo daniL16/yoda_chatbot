@@ -43,10 +43,11 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
-     * @param string $message Message to send
+     * @param string $message      Message to send
      * @param string $conversation Session token
      *
      * @return array with bot's answer and sessionToken
+     *
      * @throws GuzzleException
      */
     public function sendMessage(string $message, string $conversationToken = ''): array
@@ -56,15 +57,15 @@ final class ChatBotApiService extends InbentaApiService
         }
 
         try {
-            $response = $this->exec('send_message', ['message' => $message], ['x-inbenta-session' => 'Bearer ' . $conversationToken]);
+            $response = $this->exec('send_message', ['message' => $message], ['x-inbenta-session' => 'Bearer '.$conversationToken]);
             $response = json_decode($response->getBody()->getContents());
-        }catch (GuzzleException $exception){
+        } catch (GuzzleException $exception) {
             // If session expired, open a new conversation
-           if(str_contains($exception->getMessage(),'Session expired')){
-               return $this->sendMessage($message);
-           }
-           // Aquí habría que tratar el error mejor
-           return ['session_token' => $conversationToken, 'response_message' => ''];
+            if (str_contains($exception->getMessage(), 'Session expired')) {
+                return $this->sendMessage($message);
+            }
+            // Aquí habría que tratar el error mejor
+            return ['session_token' => $conversationToken, 'response_message' => ''];
         }
 
         return ['session_token' => $conversationToken, 'response_message' => $response->answers[0]->message];

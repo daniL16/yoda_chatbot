@@ -18,20 +18,17 @@ class InbentaSwapiApiService extends InbentaApiService
         ];
     }
 
-    /**
-     */
     private function makeQuery(string $query, int $nItems): string
     {
         try {
             $response = $this->exec('api', ['query' => $query, 'variables' => ['first' => $nItems]]);
+
             return $response->getBody()->getContents();
-        } catch (GuzzleException $exception){
+        } catch (GuzzleException $exception) {
             return json_encode(['status' => $exception->getCode(), 'error' => $exception->getMessage()]);
         }
     }
 
-    /**
-     */
     public function getFilms(): array
     {
         $query = <<<'GRAPHQL'

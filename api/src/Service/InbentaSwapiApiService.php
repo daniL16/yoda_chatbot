@@ -36,7 +36,7 @@ class InbentaSwapiApiService extends InbentaApiService
                   GRAPHQL;
         $response = json_decode($this->makeQuery($query, self::N_FILMS), true);
 
-        return array_column($response['data']['allFilms']['films'],'title');
+        return array_column($response['data']['allFilms']['films'], 'title');
     }
 
     public function getPeople(): array
@@ -51,6 +51,7 @@ class InbentaSwapiApiService extends InbentaApiService
                  }
                  GRAPHQL;
         $response = json_decode($this->makeQuery($query, self::N_PEOPLE), true);
-        return array_column($response['data']['allPeople']['people'],'name');
+
+        return array_column($response['data']['allPeople']['people'], 'name');
     }
 }

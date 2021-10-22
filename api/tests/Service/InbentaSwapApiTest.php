@@ -3,7 +3,7 @@
 namespace App\Tests\Service;
 
 use App\Service\InbentaSwapiApiService;
-use  Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class InbentaSwapApiTest extends WebTestCase{
 
@@ -24,12 +24,11 @@ class InbentaSwapApiTest extends WebTestCase{
         $this->assertGreaterThan(0, $films);
     }
 
-
     public function testGetPeople()
     {
         $people = $this->apiClient->getPeople();
         /*
-         * We expect an array with films.
+         * We expect an array with some characters
          */
         $this->assertIsArray($people);
         $this->assertGreaterThan(0, $people);

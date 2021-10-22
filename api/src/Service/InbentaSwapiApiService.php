@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 class InbentaSwapiApiService extends InbentaApiService
 {
     private const N_FILMS = 5;
@@ -16,13 +18,20 @@ class InbentaSwapiApiService extends InbentaApiService
         ];
     }
 
+    /**
+     */
     private function makeQuery(string $query, int $nItems): string
     {
-        $response = $this->exec('api', ['query' => $query, 'variables' => ['first' => $nItems]]);
-
-        return $response->getBody()->getContents();
+        try {
+            $response = $this->exec('api', ['query' => $query, 'variables' => ['first' => $nItems]]);
+            return $response->getBody()->getContents();
+        } catch (GuzzleException $exception){
+            return json_encode(['status' => $exception->getCode(), 'error' => $exception->getMessage()]);
+        }
     }
 
+    /**
+     */
     public function getFilms(): array
     {
         $query = <<<'GRAPHQL'

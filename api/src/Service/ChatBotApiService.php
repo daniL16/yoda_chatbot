@@ -2,8 +2,13 @@
 
 namespace App\Service;
 
+use GuzzleHttp\Exception\GuzzleException;
+
 final class ChatBotApiService extends InbentaApiService
 {
+    /**
+     * @throws GuzzleException
+     */
     public function __construct()
     {
         parent::__construct();
@@ -14,6 +19,9 @@ final class ChatBotApiService extends InbentaApiService
         ]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
     private function getApiUrl(): string
     {
         $response = json_decode($this->exec('get_apis')->getBody()->getContents());
@@ -21,6 +29,9 @@ final class ChatBotApiService extends InbentaApiService
         return $response->apis->chatbot;
     }
 
+    /**
+     * @throws GuzzleException
+     */
     private function openConversation(): string
     {
         $payload = [
@@ -32,20 +43,30 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
-     * @param string $message      Message to send
+     * @param string $message Message to send
      * @param string $conversation Session token
      *
      * @return array with bot's answer and sessionToken
+     * @throws GuzzleException
      */
-    public function sendMessage(string $message, string $conversation = ''): array
+    public function sendMessage(string $message, string $conversationToken = ''): array
     {
-        if (empty($conversation)) {
-            $conversation = $this->openConversation();
+        if (empty($conversationToken)) {
+            $conversationToken = $this->openConversation();
         }
 
-        $response = $this->exec('send_message', ['message' => $message], ['x-inbenta-session' => 'Bearer '.$conversation]);
-        $response = json_decode($response->getBody()->getContents());
+        try {
+            $response = $this->exec('send_message', ['message' => $message], ['x-inbenta-session' => 'Bearer ' . $conversationToken]);
+            $response = json_decode($response->getBody()->getContents());
+        }catch (GuzzleException $exception){
+            // If session expired, open a new conversation
+           if(str_contains($exception->getMessage(),'Session expired')){
+               return $this->sendMessage($message);
+           }
+           // Aquí habría que tratar el error mejor
+           return ['session_token' => $conversationToken, 'response_message' => ''];
+        }
 
-        return ['session_token' => $conversation, 'response_message' => $response->answers[0]->message];
+        return ['session_token' => $conversationToken, 'response_message' => $response->answers[0]->message];
     }
 }

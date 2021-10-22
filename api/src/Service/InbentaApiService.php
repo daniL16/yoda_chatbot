@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class InbentaApiService
 {
@@ -40,6 +39,13 @@ abstract class InbentaApiService
         $this->token = $this->getToken();
     }
 
+    /**
+     * @param string $api
+     * @param array $data
+     * @param array $options
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
     protected function exec(string $api, array $data = [], array $options = []): ResponseInterface
     {
         // Build url
@@ -47,30 +53,27 @@ abstract class InbentaApiService
         $url .= $this->apiConfig[$api]['uri'];
 
         $headers = $this->buildHeader($api, $options);
-        try {
-            $response = match ($this->apiConfig[$api]['method']) {
-                'GET' => $this->client->get($url, ['headers' => $headers]),
-                'POST' => $this->client->post($url, ['json' => $data, 'headers' => $headers]),
-                default => throw new InvalidArgumentException('Method not allowed'),
-            };
-        } catch (GuzzleException $exception) {
-            $response = new JsonResponse(['url' => $url,'error' => $exception->getMessage(), 'headers' => $headers, 'data' => $data]);
-            die($response);
-        }
 
-        return $response;
+        return match ($this->apiConfig[$api]['method']) {
+            'GET' => $this->client->get($url, ['headers' => $headers]),
+            'POST' => $this->client->post($url, ['json' => $data, 'headers' => $headers]),
+            default => throw new InvalidArgumentException('Method not allowed'),
+        };
     }
 
     protected function getToken(): string
     {
         $body = ['secret' => $this->secret];
-        $response = json_decode($this->exec('auth', $body)->getBody()->getContents());
-        return $response->accessToken;
+        try {
+            $response = json_decode($this->exec('auth', $body)->getBody()->getContents());
+            return $response->accessToken;
+        }catch (GuzzleException){
+            return '';
+        }
     }
 
     /**
      * @param string $api
-     * @param array $data
      * @param array $options
      * @return array
      */

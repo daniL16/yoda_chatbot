@@ -53,6 +53,6 @@ class MessageController
      * @return string
      */
     private function postProcessNotFound(): string{
-        return json_encode($this->swapiApiClient->getFilms());
+        return json_encode($this->swapiApiClient->getPeople());
     }
 }

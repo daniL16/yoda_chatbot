@@ -51,13 +51,14 @@ export default {
           this.waitingResponse = true;
           this.messagesThread.push(this.new_message);
           api.sendMessage(this.new_message, this.conversationToken).then(res => {
-            let answer = JSON.parse(res);
+            let answer = JSON.parse(res.data);
             this.messagesThread.push(answer.response_message);
             this.conversationToken = answer.session_token;
             localStorage.setItem('conversationToken', this.conversationToken);
             this.new_message = '';
             this.waitingResponse = false;
-          }).catch(() => {
+          }).catch((error) => {
+            console.log(error)
             this.waitingResponse = false;
             alert('Sorry! Something didn\'t work as it should, try again young padawan.')
           })

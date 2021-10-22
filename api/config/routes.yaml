@@ -4,5 +4,5 @@ test:
 
 send_message:
     path: /send_message
-    method: 'POST'
+    methods: 'POST'
     controller: App\Controller\MessageController::send

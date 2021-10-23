@@ -36,7 +36,8 @@ export default {
       new_message: '',
       messagesThread: [],
       conversationToken: '',
-      waitingResponse : false
+      waitingResponse : false,
+      notFoundAttempts : 0,
     }),
     methods:{
       checkForm(){
@@ -50,11 +51,15 @@ export default {
         if(this.checkForm()) {
           this.waitingResponse = true;
           this.messagesThread.push(this.new_message);
-          api.sendMessage(this.new_message, this.conversationToken).then(res => {
+          api.sendMessage(this.new_message, this.conversationToken, this.notFoundAttempts).then(res => {
             let answer = JSON.parse(res.data);
             this.messagesThread.push(answer.response_message);
             this.conversationToken = answer.session_token;
-            localStorage.setItem('conversationToken', this.conversationToken);
+            if (answer.not_found_message === true){
+              this.notFoundAttempts = this.notFoundAttempts + 1;
+              sessionStorage.setItem('notFoundAttempts', this.notFoundAttempts)
+            }
+            sessionStorage.setItem('conversationToken', this.conversationToken);
             this.new_message = '';
             this.waitingResponse = false;
           }).catch((error) => {
@@ -67,14 +72,15 @@ export default {
       clearConservation(){
         this.messagesThread = []
         this.conversationToken = '';
+        this.notFoundAttempts = 0;
       }
     },
     mounted(){
       if(localStorage.getItem('messages')){
           this.messagesThread = localStorage.getItem('messages').split(',')
       }
-      if(localStorage.getItem('conversationToken')){
-        this.conversationToken = localStorage.getItem('conversationToken')
+      if(sessionStorage.getItem('conversationToken')){
+        this.conversationToken = sessionStorage.getItem('conversationToken')
       }
     },
     watch:{
@@ -102,8 +108,23 @@ export default {
 }
 
 .message-item {
-  padding-bottom: 1.5em;
+  padding: 0.5em;
+  width: 45%;
+  border-radius: 10px;
+  background: #F1F0F0;
+  margin-bottom: 0.8em;
 }
 
+.chat-inputs{
+  display: flex;
+  width: 90%;
+  justify-content: center;
+}
 
+#writingText{
+  padding: 0.2em;
+  display: flex;
+  width: 45%;
+  justify-content: center;
+}
 </style>

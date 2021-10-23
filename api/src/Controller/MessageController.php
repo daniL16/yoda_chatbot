@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\ChatBotApiService;
 use App\Service\InbentaSwapiApiService;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -22,17 +23,44 @@ class MessageController
     public function send(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            return new JsonResponse(['error' => sprintf('Invalid JSON format: %s', json_last_error_msg())], 400);
-        }
-        if (!isset($data['message'])) {
-            return new JsonResponse(['error' => 'message is required'], 400);
+        $errors = [];
+        if(!$this->validateRequest($request, $errors)){
+            return new JsonResponse(['errors' => $errors], 400);
         }
 
-        return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? ''), 200);
+        try {
+            return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? '', (int) $data['notFountAttempts']), 200);
+        } catch (GuzzleException $exception) {
+            return new JsonResponse(['errors' => $exception->getMessage()],500);
+        }
     }
 
-    private function getResponseMessage(string $message, string $conversationToken): string{
+    /**
+     * @param Request $request
+     * @param array $errors
+     * @return bool
+     */
+    private function validateRequest(Request $request, array &$errors) : bool{
+         $data = json_decode($request->getContent(), true);
+         $valid = true;
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            $errors[] =  sprintf('Invalid JSON format: %s', json_last_error_msg());
+            $valid = false;
+        }
+        if (!isset($data['message'])) {
+            $errors[] = 'Message is required';
+            $valid = false;
+        }
+        return $valid;
+    }
+
+    /**
+     * @param string $message
+     * @param string $conversationToken
+     * @return string
+     * @throws GuzzleException
+     */
+    private function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
         if(str_contains($message, 'force')){
             $responseMessage = json_encode($this->swapiApiClient->getFilms());
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
@@ -42,7 +70,10 @@ class MessageController
             if(str_contains($response['response_message'],'couldn\'t find')
                 || str_contains($response['response_message'], 'Please search again')
             ){
-                $response['response_message'] = $this->postProcessNotFound();
+                $response['not_found_message'] = true;
+                if($previousNotFound >= self::NOT_FOUND_ATTEMPTS){
+                    $response['response_message'] = $this->postProcessNotFound();
+                }
             }
         }
 

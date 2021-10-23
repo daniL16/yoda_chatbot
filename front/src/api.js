@@ -11,10 +11,11 @@ const axiosInstance = axios.create({
 });
 
 
-async function sendMessage(message, conversationToken){
+async function sendMessage(message, conversationToken, notFountAttempts){
      return axiosInstance.post(api_url,{
             message: message,
-            sessionToken: conversationToken
+            sessionToken: conversationToken,
+            notFountAttempts: notFountAttempts
      });
 }
 

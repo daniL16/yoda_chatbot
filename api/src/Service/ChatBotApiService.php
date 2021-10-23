@@ -64,8 +64,6 @@ final class ChatBotApiService extends InbentaApiService
             if (str_contains($exception->getMessage(), 'Session expired')) {
                 return $this->sendMessage($message);
             }
-            // Aquí habría que tratar el error mejor
-            return ['session_token' => $conversationToken, 'response_message' => ''];
         }
 
         return ['session_token' => $conversationToken, 'response_message' => $response->answers[0]->message];

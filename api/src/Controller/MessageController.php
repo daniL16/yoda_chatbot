@@ -64,7 +64,7 @@ class MessageController
     private function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
         if(str_contains($message, 'force')){
             $films = json_encode($this->swapiApiClient->getFilms());
-            $films = str_replace('"','', str_replace('[','', $films));
+            $films = str_replace('"','', str_replace(['[',']'],['',''], $films));
             $responseMessage = 'I haven\'t found any results, but here is a list of some Star Wars films: '. $films;
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }
@@ -88,7 +88,7 @@ class MessageController
      */
     private function postProcessNotFound(): string{
         $characters = json_encode($this->swapiApiClient->getPeople());
-        $characters = str_replace('"','', str_replace('[','', $characters));
+        $characters = str_replace('"','', str_replace(['[',']'],['',''], $characters));
         return 'I haven\'t found any results, but here is a list of some Star Wars characters: '. $characters;
     }
 }

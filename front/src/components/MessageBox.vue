@@ -36,7 +36,7 @@ export default {
       new_message: '',
       messagesThread: [],
       conversationToken: '',
-      waitingResponse : true,
+      waitingResponse : false,
       notFoundAttempts : 0,
     }),
     methods:{

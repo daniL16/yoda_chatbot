@@ -57,12 +57,15 @@ class MessageController
     /**
      * @param string $message
      * @param string $conversationToken
+     * @param int $previousNotFound
      * @return string
      * @throws GuzzleException
      */
     private function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
         if(str_contains($message, 'force')){
-            $responseMessage = json_encode($this->swapiApiClient->getFilms());
+            $films = json_encode($this->swapiApiClient->getFilms());
+            $films = str_replace('"','', str_replace('[','', $films));
+            $responseMessage = 'I haven\'t found any results, but here is a list of some Star Wars films: '. $films;
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }
         else{
@@ -84,6 +87,8 @@ class MessageController
      * @return string
      */
     private function postProcessNotFound(): string{
-        return json_encode($this->swapiApiClient->getPeople());
+        $characters = json_encode($this->swapiApiClient->getPeople());
+        $characters = str_replace('"','', str_replace('[','', $characters));
+        return 'I haven\'t found any results, but here is a list of some Star Wars characters: '. $characters;
     }
 }

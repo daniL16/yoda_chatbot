@@ -10,16 +10,16 @@
          <Message :message="message" :key="key"></Message>
         </li>
       </ul>
-      <span v-if="waitingResponse"> writing... </span>
+      <span v-if="waitingResponse" id="writingText"> writing... </span>
     </div>
-    <div class="chat-inputs">
+    <div class="chat-input">
       <input
           type="text"
           v-on:keyup.enter="sendMessage"
           v-model="new_message"
           placeholder="Type your message"
       />
-      <button v-on:click="sendMessage">Send!</button>
+      <button v-on:click="sendMessage" :disabled="waitingResponse">Send!</button>
       <button v-on:click="clearConservation">Clear</button>
     </div>
   </section>
@@ -36,11 +36,12 @@ export default {
       new_message: '',
       messagesThread: [],
       conversationToken: '',
-      waitingResponse : false,
+      waitingResponse : true,
       notFoundAttempts : 0,
     }),
     methods:{
-      checkForm(){
+      checkValidForm(){
+        // we dont allow empty messages
         let valid = this.new_message !== '';
         if(!valid){
           alert('Please, enter any message.');
@@ -48,19 +49,23 @@ export default {
         return valid;
       },
       sendMessage(){
-        if(this.checkForm()) {
+        if(this.checkValidForm()) {
+          // Check "writing..." div
           this.waitingResponse = true;
           this.messagesThread.push(this.new_message);
           api.sendMessage(this.new_message, this.conversationToken, this.notFoundAttempts).then(res => {
             let answer = JSON.parse(res.data);
             this.messagesThread.push(answer.response_message);
             this.conversationToken = answer.session_token;
+            // increase the counter of messages of type not_found
             if (answer.not_found_message === true){
               this.notFoundAttempts = this.notFoundAttempts + 1;
               sessionStorage.setItem('notFoundAttempts', this.notFoundAttempts)
             }
             sessionStorage.setItem('conversationToken', this.conversationToken);
+            // clear message input
             this.new_message = '';
+            // Hide "writing..." div
             this.waitingResponse = false;
           }).catch((error) => {
             console.log(error)
@@ -76,6 +81,7 @@ export default {
       }
     },
     mounted(){
+      // if we have a saved conversation we display it
       if(localStorage.getItem('messages')){
           this.messagesThread = localStorage.getItem('messages').split(',')
       }
@@ -84,6 +90,7 @@ export default {
       }
     },
     watch:{
+      // when a new message is send we save it in storage
       messagesThread: function (messages){
         localStorage.messages = messages
       }
@@ -98,6 +105,7 @@ export default {
   display: flex;
   flex-direction: column;
   list-style-type: none;
+  justify-content: center;
 }
 
 .chat-box {
@@ -115,16 +123,17 @@ export default {
   margin-bottom: 0.8em;
 }
 
-.chat-inputs{
+#writingText{
+  padding-left: 40px;
   display: flex;
-  width: 90%;
+  max-width: 200px;
   justify-content: center;
 }
 
-#writingText{
-  padding: 0.2em;
-  display: flex;
-  width: 45%;
-  justify-content: center;
+.chat-input{
+  margin: 0.4em;
+}
+.chat-input input{
+  width: 60%;
 }
 </style>

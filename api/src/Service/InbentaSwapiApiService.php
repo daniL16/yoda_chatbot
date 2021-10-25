@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use GuzzleHttp\Exception\GuzzleException;
 
-class InbentaSwapiApiService extends InbentaApiService
+final class InbentaSwapiApiService extends InbentaApiService
 {
     private const N_FILMS = 5;
     private const N_PEOPLE = 5;

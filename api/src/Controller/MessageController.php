@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Service\ChatBotApiService;
@@ -8,7 +10,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class MessageController
+final class MessageController
 {
 
     public const NOT_FOUND_ATTEMPTS = 2;

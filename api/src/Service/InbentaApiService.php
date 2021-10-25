@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use GuzzleHttp\Client;
@@ -9,22 +11,16 @@ use Psr\Http\Message\ResponseInterface;
 
 abstract class InbentaApiService
 {
-    /** @var string  */
     private string $token;
 
-    /** @var string */
     protected string $baseUrl;
 
-    /** @var string */
     private string $apiKey;
 
-    /** @var string  */
     private string $secret;
 
-    /** @var Client  */
     protected Client $client;
 
-    /** @var array */
     protected array $apiConfig = [
         'auth' => ['uri' => '/auth', 'method' => 'POST', 'auth' => false],
         'get_apis' => ['uri' => '/apis', 'method' => 'GET', 'auth' => true],

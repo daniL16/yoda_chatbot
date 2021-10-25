@@ -16,7 +16,7 @@ class InbentaSwapApiTest extends WebTestCase{
 
     public function testGetFilms()
     {
-        $films = json_decode($this->apiClient->getFilms(),true);
+        $films = $this->apiClient->getFilms();
         /*
          * We expect an array with films.
          */

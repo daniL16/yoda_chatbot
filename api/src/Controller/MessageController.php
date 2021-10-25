@@ -29,7 +29,8 @@ class MessageController
         }
 
         try {
-            return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? '', (int) $data['notFountAttempts'] ?? 0), 200);
+            $failedAttempts = $data['notFoundAttempts'] ?? 0;
+            return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? '', (int)$failedAttempts), 200);
         } catch (GuzzleException $exception) {
             return new JsonResponse(['errors' => $exception->getMessage()],500);
         }
@@ -47,7 +48,7 @@ class MessageController
             $errors[] =  sprintf('Invalid JSON format: %s', json_last_error_msg());
             $valid = false;
         }
-        if (!isset($data['message'])) {
+        if (empty($data['message'])) {
             $errors[] = 'Message is required';
             $valid = false;
         }

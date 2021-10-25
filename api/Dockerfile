@@ -48,11 +48,11 @@ ARG APP_ENV=prod
 # prevent the reinstallation of vendors at every changes in the source code
 COPY composer.json composer.lock symfony.lock ./
 RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-scripts --no-progress --no-suggest; \
+	composer install --prefer-dist --no-scripts --no-progress --no-suggest; \
 	composer clear-cache
 
 # do not use .env files in production
-COPY .env ./
+COPY .env .env.test ./
 #RUN composer dump-env prod; \
 #	rm .env
 
@@ -61,6 +61,9 @@ COPY bin bin/
 COPY config config/
 COPY public public/
 COPY src src/
+COPY tests tests/
+
+COPY phpunit.xml.dist ./
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \

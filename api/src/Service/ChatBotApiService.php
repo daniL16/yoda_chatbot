@@ -32,6 +32,7 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
+     * Start a new conversation. Returns the token of the conversation,
      * @throws GuzzleException
      */
     private function openConversation(): string
@@ -45,6 +46,8 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
+     * Send a new message to the bot. If the conversion token is not provided, start a new one.
+     *
      * @param string $message Message to send
      *
      * @return array<String> with bot's answer and sessionToken

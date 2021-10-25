@@ -21,6 +21,10 @@ abstract class InbentaApiService
 
     protected Client $client;
 
+    /*
+     * Array with the different endpoints of the api. It indicates the endpoint,
+     * the method it allows and if it needs authentication.
+     */
     protected array $apiConfig = [
         'auth' => ['uri' => '/auth', 'method' => 'POST', 'auth' => false],
         'get_apis' => ['uri' => '/apis', 'method' => 'GET', 'auth' => true],
@@ -57,6 +61,9 @@ abstract class InbentaApiService
         };
     }
 
+    /**
+     * Obtain the authentication token from the api.
+     */
     protected function getToken(): string
     {
         $body = ['secret' => $this->secret];
@@ -69,11 +76,14 @@ abstract class InbentaApiService
     }
 
     /**
-     * @param string $api
+     * @param string $api  api from $this->apiConfig
      * @param array $options
      * @return array
      */
     private function buildHeader(string $api, array $options = []): array{
+        if(!isset($this->apiConfig[$api])){
+            return [];
+        }
         // Build headers array
         $headers = [
             'x-inbenta-key' => $this->apiKey,

@@ -20,11 +20,16 @@ final class InbentaSwapiApiService extends InbentaApiService
         ];
     }
 
+    /**
+     * Perform a query via GraphQL to the api.
+     * @param string $query
+     * @param int $nItems Number of items to return
+     * @return string JSON with results
+     */
     private function makeQuery(string $query, int $nItems): string
     {
         try {
             $response = $this->exec('api', ['query' => $query, 'variables' => ['first' => $nItems]]);
-
             return $response->getBody()->getContents();
         } catch (GuzzleException $exception) {
             return (string) json_encode(['status' => $exception->getCode(), 'error' => $exception->getMessage()]);
@@ -32,6 +37,7 @@ final class InbentaSwapiApiService extends InbentaApiService
     }
 
     /**
+     * Get a list of movies. The number of movies returned is indicated in the constant N_FILMS.
      * @return array<String>
      */
     public function getFilms(): array
@@ -51,6 +57,7 @@ final class InbentaSwapiApiService extends InbentaApiService
     }
 
     /**
+     * Get a list of characters. The number of movies returned is indicated in the constant N_FILMS.
      * @return array<String>
      */
     public function getPeople(): array

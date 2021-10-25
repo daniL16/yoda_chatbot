@@ -1,5 +1,5 @@
 <template>
-  <span class="message">{{message}}</span>
+  <span class="message" v-html="message"></span>
 </template>
 
 <script>

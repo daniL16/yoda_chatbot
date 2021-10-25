@@ -29,7 +29,7 @@ class MessageController
         }
 
         try {
-            return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? '', (int) $data['notFountAttempts']), 200);
+            return new JsonResponse($this->getResponseMessage($data['message'], $data['sessionToken'] ?? '', (int) $data['notFountAttempts'] ?? 0), 200);
         } catch (GuzzleException $exception) {
             return new JsonResponse(['errors' => $exception->getMessage()],500);
         }
@@ -63,9 +63,7 @@ class MessageController
      */
     private function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
         if(str_contains($message, 'force')){
-            $films = json_encode($this->swapiApiClient->getFilms());
-            $films = str_replace('"','', str_replace(['[',']'],['',''], $films));
-            $responseMessage = 'I haven\'t found any results, but here is a list of some Star Wars films: '. $films;
+            $responseMessage = $this->formatMessage($this->swapiApiClient->getFilms(), 'films');
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }
         else{
@@ -87,8 +85,20 @@ class MessageController
      * @return string
      */
     private function postProcessNotFound(): string{
-        $characters = json_encode($this->swapiApiClient->getPeople());
-        $characters = str_replace('"','', str_replace(['[',']'],['',''], $characters));
-        return 'I haven\'t found any results, but here is a list of some Star Wars characters: '. $characters;
+        return $this->formatMessage($this->swapiApiClient->getPeople(), 'characters');
+    }
+
+    /**
+     * @param array $values
+     * @param string $type
+     * @return string
+     */
+    private function formatMessage(array $values, string $type): string{
+        $list = '<ul>';
+        foreach ($values as $value){
+            $list.= "<li> $value </li>";
+        }
+        $list .= '</ul>';
+        return "I haven't found any results, but here is a list of some Star Wars $type : $list";
     }
 }

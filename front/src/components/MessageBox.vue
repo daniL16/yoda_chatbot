@@ -53,6 +53,8 @@ export default {
           // Check "writing..." div
           this.waitingResponse = true;
           this.messagesThread.push(this.new_message);
+          // clear message input
+          this.new_message = '';
           api.sendMessage(this.new_message, this.conversationToken, this.notFoundAttempts).then(res => {
             let answer = JSON.parse(res.data);
             this.messagesThread.push(answer.response_message);
@@ -63,8 +65,6 @@ export default {
               sessionStorage.setItem('notFoundAttempts', this.notFoundAttempts)
             }
             sessionStorage.setItem('conversationToken', this.conversationToken);
-            // clear message input
-            this.new_message = '';
             // Hide "writing..." div
             this.waitingResponse = false;
           }).catch((error) => {

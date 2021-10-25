@@ -26,30 +26,25 @@ final class ProcessMessageService
      * @throws GuzzleException
      */
     public function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
+        // If the message contains the word force we get the list of movies
         if(str_contains(strtolower($message), 'force')){
             $responseMessage = $this->formatMessage($this->swapiApiClient->getFilms(), 'films');
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }
         else{
             $response = $this->chatBotApiClient->sendMessage($message, $conversationToken);
+            // If the response message is of type 'not_found' we get the list of characters.
             if(str_contains($response['response_message'],'couldn\'t find')
                 || str_contains($response['response_message'], 'Please search again')
             ){
                 $response['not_found_message'] = true;
                 if($previousNotFound >= self::NOT_FOUND_ATTEMPTS){
-                    $response['response_message'] = $this->postProcessNotFound();
+                    $response['response_message'] = $this->formatMessage($this->swapiApiClient->getPeople(), 'characters');
                 }
             }
         }
 
         return (string) json_encode($response);
-    }
-
-    /**
-     * @return string
-     */
-    private function postProcessNotFound(): string{
-        return $this->formatMessage($this->swapiApiClient->getPeople(), 'characters');
     }
 
     /**

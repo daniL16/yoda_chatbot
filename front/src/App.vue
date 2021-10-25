@@ -10,7 +10,10 @@ import MessageBox from "./components/MessageBox";
 
 export default {
   name: 'App',
-  components: {MessageBox}
+  components: {MessageBox},
+  created(){
+    document.title = 'Yoda Chat'
+  }
 }
 </script>
 

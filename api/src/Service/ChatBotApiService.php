@@ -44,7 +44,7 @@ final class ChatBotApiService extends InbentaApiService
 
     /**
      * @param string $message Message to send
-     * @param string $conversationToken
+     *
      * @return array<String> with bot's answer and sessionToken
      *
      * @throws GuzzleException

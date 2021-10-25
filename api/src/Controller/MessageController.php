@@ -62,7 +62,7 @@ class MessageController
      * @throws GuzzleException
      */
     private function getResponseMessage(string $message, string $conversationToken, int $previousNotFound = 0): string{
-        if(str_contains($message, 'force')){
+        if(str_contains(strtolower($message), 'force')){
             $responseMessage = $this->formatMessage($this->swapiApiClient->getFilms(), 'films');
             $response = ['session_token' => $conversationToken, 'response_message' => $responseMessage];
         }

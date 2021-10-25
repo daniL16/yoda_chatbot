@@ -32,7 +32,8 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
-     * Start a new conversation. Returns the token of the conversation,
+     * Start a new conversation. Returns the token of the conversation,.
+     *
      * @throws GuzzleException
      */
     private function openConversation(): string

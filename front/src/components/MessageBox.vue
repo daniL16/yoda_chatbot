@@ -12,7 +12,7 @@
       </ul>
       <span v-if="waitingResponse" id="writingText"> writing... </span>
     </div>
-    <div class="chat-input">
+    <div class="chat-input" ref="inputs">
       <input
           type="text"
           v-on:keyup.enter="sendMessage"
@@ -67,6 +67,7 @@ export default {
             sessionStorage.setItem('conversationToken', this.conversationToken);
             // Hide "writing..." div
             this.waitingResponse = false;
+            window.scrollTo(0,  this.$refs.inputs.offsetTop);
           }).catch((error) => {
             console.log(error)
             this.waitingResponse = false;

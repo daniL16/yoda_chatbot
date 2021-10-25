@@ -4,10 +4,10 @@
       <ul class="message-list">
         <li
             class="message-item"
-            v-for="(message,key) in messagesThread"
+            v-for="(messageInfo,key) in messagesThread"
             :key="key"
         >
-         <Message :message="message" :key="key"></Message>
+         <Message :message="messageInfo.message" :author= "messageInfo.author" :key="key"></Message>
         </li>
       </ul>
       <span v-if="waitingResponse" id="writingText"> writing... </span>
@@ -52,10 +52,10 @@ export default {
         if(this.checkValidForm()) {
           // Check "writing..." div
           this.waitingResponse = true;
-          this.messagesThread.push(this.new_message);
+          this.messagesThread.push(({message:this.new_message, author: 'Me'}));
           api.sendMessage(this.new_message, this.conversationToken, this.notFoundAttempts).then(res => {
             let answer = JSON.parse(res.data);
-            this.messagesThread.push(answer.response_message);
+            this.messagesThread.push({message:answer.response_message, author: 'Yoda'});
             this.conversationToken = answer.session_token;
             // increase the counter of messages of type not_found
             if (answer.not_found_message === true){
@@ -84,7 +84,7 @@ export default {
     mounted(){
       // if we have a saved conversation we display it
       if(localStorage.getItem('messages')){
-          this.messagesThread = localStorage.getItem('messages').split(',')
+          this.messagesThread = JSON.parse(localStorage.getItem('messages'))
       }
       if(sessionStorage.getItem('conversationToken')){
         this.conversationToken = sessionStorage.getItem('conversationToken')
@@ -93,7 +93,7 @@ export default {
     watch:{
       // when a new message is send we save it in storage
       messagesThread: function (messages){
-        localStorage.messages = messages
+        localStorage.messages = JSON.stringify(messages)
       }
     }
 

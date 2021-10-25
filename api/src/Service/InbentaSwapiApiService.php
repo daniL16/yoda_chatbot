@@ -25,10 +25,13 @@ class InbentaSwapiApiService extends InbentaApiService
 
             return $response->getBody()->getContents();
         } catch (GuzzleException $exception) {
-            return json_encode(['status' => $exception->getCode(), 'error' => $exception->getMessage()]);
+            return (string) json_encode(['status' => $exception->getCode(), 'error' => $exception->getMessage()]);
         }
     }
 
+    /**
+     * @return array<String>
+     */
     public function getFilms(): array
     {
         $query = <<<'GRAPHQL'
@@ -45,6 +48,9 @@ class InbentaSwapiApiService extends InbentaApiService
         return array_column($response['data']['allFilms']['films'], 'title');
     }
 
+    /**
+     * @return array<String>
+     */
     public function getPeople(): array
     {
         $query = <<<'GRAPHQL'

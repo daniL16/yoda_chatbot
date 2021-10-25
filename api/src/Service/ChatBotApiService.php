@@ -43,10 +43,9 @@ final class ChatBotApiService extends InbentaApiService
     }
 
     /**
-     * @param string $message      Message to send
-     * @param string $conversation Session token
-     *
-     * @return array with bot's answer and sessionToken
+     * @param string $message Message to send
+     * @param string $conversationToken
+     * @return array<String> with bot's answer and sessionToken
      *
      * @throws GuzzleException
      */
@@ -56,9 +55,12 @@ final class ChatBotApiService extends InbentaApiService
             $conversationToken = $this->openConversation();
         }
 
+        $responseMessage = '';
+
         try {
             $response = $this->exec('send_message', ['message' => $message], ['x-inbenta-session' => 'Bearer '.$conversationToken]);
             $response = json_decode($response->getBody()->getContents());
+            $responseMessage = $response->answers[0]->message;
         } catch (GuzzleException $exception) {
             // If session expired, open a new conversation
             if (str_contains($exception->getMessage(), 'Session expired')) {
@@ -66,6 +68,6 @@ final class ChatBotApiService extends InbentaApiService
             }
         }
 
-        return ['session_token' => $conversationToken, 'response_message' => $response->answers[0]->message];
+        return ['session_token' => $conversationToken, 'response_message' => $responseMessage];
     }
 }

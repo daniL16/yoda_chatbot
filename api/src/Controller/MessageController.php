@@ -22,11 +22,12 @@ class MessageController
 
     public function send(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
         $errors = [];
         if(!$this->validateRequest($request, $errors)){
             return new JsonResponse(['errors' => $errors], 400);
         }
+
+        $data = json_decode((string)$request->getContent(), true);
 
         try {
             $failedAttempts = $data['notFoundAttempts'] ?? 0;
@@ -38,11 +39,11 @@ class MessageController
 
     /**
      * @param Request $request
-     * @param array $errors
+     * @param array<String> $errors
      * @return bool
      */
     private function validateRequest(Request $request, array &$errors) : bool{
-         $data = json_decode($request->getContent(), true);
+         $data = json_decode((string) $request->getContent(), true);
          $valid = true;
         if (JSON_ERROR_NONE !== json_last_error()) {
             $errors[] =  sprintf('Invalid JSON format: %s', json_last_error_msg());
@@ -79,7 +80,7 @@ class MessageController
             }
         }
 
-        return json_encode($response);
+        return (string) json_encode($response);
     }
 
     /**
@@ -90,7 +91,7 @@ class MessageController
     }
 
     /**
-     * @param array $values
+     * @param array<String> $values
      * @param string $type
      * @return string
      */
